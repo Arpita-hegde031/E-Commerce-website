@@ -1,0 +1,196 @@
+-- ============================================================
+--  VOGUEX DATABASE  
+--  In MySQL Workbench: Open this file → Run ALL (Ctrl+Shift+Enter)
+-- ============================================================
+
+DROP DATABASE IF EXISTS voguex_db;
+CREATE DATABASE voguex_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE voguex_db;
+
+-- ── USERS ────────────────────────────────────────────────────
+CREATE TABLE users (
+  id         INT          NOT NULL AUTO_INCREMENT,
+  name       VARCHAR(100) NOT NULL,
+  email      VARCHAR(150) NOT NULL,
+  password   VARCHAR(255) NOT NULL,
+  role       VARCHAR(10)  NOT NULL DEFAULT 'user',
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_email (email)
+);
+
+-- ── CATEGORIES ───────────────────────────────────────────────
+CREATE TABLE categories (
+  id   INT          NOT NULL AUTO_INCREMENT,
+  slug VARCHAR(50)  NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_slug (slug)
+);
+
+INSERT INTO categories (slug, name) VALUES
+  ('women',       'Women'),
+  ('men',         'Men'),
+  ('kids',        'Kids'),
+  ('shoes',       'Shoes'),
+  ('accessories', 'Accessories'),
+  ('offers',      'Offers');
+
+-- ── PRODUCTS ─────────────────────────────────────────────────
+CREATE TABLE products (
+  id             INT           NOT NULL AUTO_INCREMENT,
+  name           VARCHAR(200)  NOT NULL,
+  price          DECIMAL(10,2) NOT NULL,
+  original_price DECIMAL(10,2),
+  category       VARCHAR(50)   NOT NULL,
+  tag            VARCHAR(50)   NOT NULL DEFAULT '',
+  rating         DECIMAL(2,1)  NOT NULL DEFAULT 0.0,
+  reviews        INT           NOT NULL DEFAULT 0,
+  image          TEXT          NOT NULL,
+  colors         TEXT,
+  stock          INT           NOT NULL DEFAULT 100,
+  created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY fk_category (category) REFERENCES categories(slug)
+);
+
+-- ── SEED PRODUCTS ────────────────────────────────────────────
+INSERT INTO products (id,name,price,original_price,category,tag,rating,reviews,image,colors,stock) VALUES
+(1,'Silk Wrap Dress',129.00,NULL,'women','New',4.8,142,'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80','["#c9a96e","#1a1a2e","#8b0000"]',50),
+(2,'Linen Blazer Set',189.00,NULL,'women','Trending',4.6,89,'https://images.unsplash.com/photo-1594938298603-c8148c4b8fb3?w=400&q=80','["#f5f5dc","#2c2c2c","#8fbc8f"]',40),
+(3,'Floral Midi Skirt',79.00,NULL,'women','',4.4,213,'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400&q=80','["#ff9eaa","#ffffff","#c9a96e"]',60),
+(4,'Cashmere Turtleneck',149.00,NULL,'women','Sale',4.9,67,'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80','["#d2b48c","#1a1a1a","#b0c4de"]',30),
+(5,'Pleated Wide-Leg Trousers',99.00,NULL,'women','New',4.5,178,'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80','["#f5f5dc","#2c2c2c","#8b0000"]',45),
+(6,'Off-Shoulder Blouse',69.00,NULL,'women','',4.3,95,'https://images.unsplash.com/photo-1485462537746-965f33f52f86?w=400&q=80','["#ffffff","#ffb6c1","#c9a96e"]',55),
+(7,'Satin Evening Gown',249.00,NULL,'women','Premium',4.9,54,'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400&q=80','["#1a1a2e","#8b0000","#2e8b57"]',20),
+(8,'Denim Jacket Women',109.00,NULL,'women','Trending',4.6,231,'https://images.unsplash.com/photo-1548126032-079a0fb0099d?w=400&q=80','["#4169e1","#1a1a1a"]',50),
+(9,'Slim Fit Oxford Shirt',89.00,NULL,'men','New',4.7,198,'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&q=80','["#ffffff","#87ceeb","#1a1a2e"]',60),
+(10,'Tapered Chino Pants',109.00,NULL,'men','',4.5,156,'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80','["#c2b280","#2c2c2c","#708090"]',55),
+(11,'Merino Wool Sweater',139.00,NULL,'men','Trending',4.8,94,'https://images.unsplash.com/photo-1611937532693-85e5a56e4efd?w=400&q=80','["#8b4513","#1a1a2e","#2f4f4f"]',40),
+(12,'Leather Biker Jacket',299.00,NULL,'men','Premium',4.9,41,'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80','["#1a1a1a","#5c3317"]',25),
+(13,'Linen Summer Shirt',75.00,NULL,'men','New',4.4,312,'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&q=80','["#ffffff","#f0e68c","#87ceeb"]',70),
+(14,'Slim Fit Suit Jacket',229.00,NULL,'men','Premium',4.8,63,'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80','["#1a1a2e","#2c2c2c","#708090"]',30),
+(15,'Classic Polo Shirt',59.00,NULL,'men','',4.3,421,'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&q=80','["#ffffff","#1a1a2e","#8b0000","#2e8b57"]',80),
+(16,'Cargo Jogger Pants',89.00,NULL,'men','Trending',4.5,187,'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80','["#2c2c2c","#556b2f","#c2b280"]',50),
+(17,'Denim Dungarees',49.00,NULL,'kids','Cute',4.6,312,'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400&q=80','["#4169e1","#87ceeb"]',60),
+(18,'Printed Tee Bundle',35.00,NULL,'kids','Bundle',4.7,478,'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=400&q=80','["#ff6347","#ffd700","#7cfc00"]',100),
+(19,'Cozy Fleece Hoodie',59.00,NULL,'kids','',4.8,201,'https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=400&q=80','["#ff69b4","#9370db","#87ceeb"]',55),
+(20,'Sports Tracksuit',69.00,NULL,'kids','Active',4.5,167,'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80','["#1a1a2e","#ff4500","#32cd32"]',45),
+(21,'Floral Summer Dress',42.00,NULL,'kids','New',4.7,289,'https://images.unsplash.com/photo-1518831959646-742c3a14ebf8?w=400&q=80','["#ff69b4","#ffd700","#87ceeb"]',65),
+(22,'School Uniform Set',55.00,NULL,'kids','Bundle',4.4,534,'https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&q=80','["#ffffff","#1a1a2e"]',90),
+(23,'White Leather Sneakers',129.00,NULL,'shoes','New',4.8,563,'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80','["#ffffff","#1a1a1a","#ff4500"]',80),
+(24,'Classic Oxford Brogues',179.00,NULL,'shoes','Premium',4.7,124,'https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=400&q=80','["#5c3317","#1a1a1a"]',30),
+(25,'Strappy Heeled Sandals',99.00,NULL,'shoes','Trending',4.5,287,'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80','["#c9a96e","#1a1a1a","#ffffff"]',50),
+(26,'Running Trail Shoes',149.00,NULL,'shoes','Active',4.9,412,'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80','["#ff4500","#1a1a2e","#32cd32"]',60),
+(27,'Ankle Chelsea Boots',199.00,NULL,'shoes','New',4.7,198,'https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=400&q=80','["#1a1a1a","#5c3317"]',35),
+(28,'Slip-On Loafers',89.00,NULL,'shoes','',4.4,341,'https://images.unsplash.com/photo-1582588678413-dbf45f4823e9?w=400&q=80','["#c2b280","#1a1a1a","#2c2c2c"]',55),
+(29,'Canvas High-Top Sneakers',75.00,NULL,'shoes','Trending',4.6,623,'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=400&q=80','["#1a1a1a","#ffffff","#ff4500","#4169e1"]',75),
+(30,'Suede Desert Boots',159.00,NULL,'shoes','',4.5,176,'https://images.unsplash.com/photo-1605812860427-4024433a70fd?w=400&q=80','["#c2b280","#8b4513","#2c2c2c"]',40),
+(31,'Leather Tote Bag',159.00,NULL,'accessories','New',4.8,234,'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80','["#c9a96e","#1a1a1a","#5c3317"]',40),
+(32,'Aviator Sunglasses',79.00,NULL,'accessories','Trending',4.6,487,'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80','["#c9a96e","#1a1a1a","#c0c0c0"]',80),
+(33,'Minimalist Watch',249.00,NULL,'accessories','Premium',4.9,156,'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80','["#c9a96e","#c0c0c0","#1a1a1a"]',25),
+(34,'Silk Neck Scarf',49.00,NULL,'accessories','',4.4,312,'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=400&q=80','["#8b0000","#1a1a2e","#2e8b57","#c9a96e"]',70),
+(35,'Structured Crossbody Bag',119.00,NULL,'accessories','New',4.7,198,'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80','["#1a1a1a","#c9a96e","#8b0000"]',45),
+(36,'Wool Beanie Hat',35.00,NULL,'accessories','',4.5,423,'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80','["#1a1a1a","#8b0000","#2f4f4f","#c9a96e"]',90),
+(37,'Leather Belt Gold Buckle',65.00,NULL,'accessories','Trending',4.6,267,'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80','["#1a1a1a","#5c3317","#c2b280"]',60),
+(38,'Pearl Drop Earrings',45.00,NULL,'accessories','New',4.7,189,'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80','["#ffffff","#c9a96e","#c0c0c0"]',75),
+(39,'Boho Maxi Dress',55.00,110.00,'offers','50% OFF',4.6,289,'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&q=80','["#daa520","#8b0000","#2e8b57"]',40),
+(40,'Mens Chino Shorts',39.00,69.00,'offers','43% OFF',4.3,521,'https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=400&q=80','["#c2b280","#1a1a2e","#2e8b57"]',60),
+(41,'Kids Winter Jacket',49.00,99.00,'offers','51% OFF',4.7,183,'https://images.unsplash.com/photo-1547949003-9792a18a2601?w=400&q=80','["#ff4500","#1a1a2e","#2e8b57"]',35),
+(42,'Running Sneakers',69.00,149.00,'offers','54% OFF',4.8,374,'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80','["#ff4500","#1a1a2e"]',50),
+(43,'Leather Tote Sale',79.00,159.00,'offers','50% OFF',4.7,143,'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80','["#c9a96e","#1a1a1a"]',30),
+(44,'Silk Wrap Dress Sale',65.00,129.00,'offers','50% OFF',4.8,98,'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80','["#c9a96e","#1a1a2e"]',25);
+
+-- ── ORDERS ───────────────────────────────────────────────────
+CREATE TABLE orders (
+  id              INT           NOT NULL AUTO_INCREMENT,
+  user_id         INT           NOT NULL,
+  status          VARCHAR(20)   NOT NULL DEFAULT 'pending',
+  total_amount    DECIMAL(10,2) NOT NULL,
+  shipping_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  tax_amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  payment_method  VARCHAR(10)   NOT NULL DEFAULT 'card',
+  first_name      VARCHAR(100)  NOT NULL,
+  last_name       VARCHAR(100)  NOT NULL,
+  email           VARCHAR(150)  NOT NULL,
+  address         TEXT          NOT NULL,
+  city            VARCHAR(100)  NOT NULL,
+  zip             VARCHAR(20)   NOT NULL,
+  created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY fk_order_user (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ── ORDER ITEMS ──────────────────────────────────────────────
+CREATE TABLE order_items (
+  id         INT           NOT NULL AUTO_INCREMENT,
+  order_id   INT           NOT NULL,
+  product_id INT           NOT NULL,
+  quantity   INT           NOT NULL DEFAULT 1,
+  price      DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY fk_item_order   (order_id)   REFERENCES orders(id)   ON DELETE CASCADE,
+  FOREIGN KEY fk_item_product (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- ── CART ─────────────────────────────────────────────────────
+CREATE TABLE cart (
+  id         INT NOT NULL AUTO_INCREMENT,
+  user_id    INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity   INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_cart (user_id, product_id),
+  FOREIGN KEY fk_cart_user    (user_id)    REFERENCES users(id)    ON DELETE CASCADE,
+  FOREIGN KEY fk_cart_product (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- ── WISHLIST ─────────────────────────────────────────────────
+CREATE TABLE wishlist (
+  id         INT       NOT NULL AUTO_INCREMENT,
+  user_id    INT       NOT NULL,
+  product_id INT       NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_wish (user_id, product_id),
+  FOREIGN KEY fk_wish_user    (user_id)    REFERENCES users(id)    ON DELETE CASCADE,
+  FOREIGN KEY fk_wish_product (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+SELECT CONCAT('Setup complete! Tables: ', COUNT(*), ' products seeded.') AS status
+FROM products;
+
+USE voguex_db;
+SHOW TABLES;
+
+SELECT id, name, price, category, tag, rating, stock 
+FROM products 
+ORDER BY category;
+
+SELECT category, COUNT(*) as total 
+FROM products 
+GROUP BY category;
+
+SELECT id, name, email, role, created_at 
+FROM users;
+
+SELECT o.id, u.name, u.email, o.total_amount, 
+       o.status, o.payment_method, o.created_at
+FROM orders o 
+JOIN users u ON o.user_id = u.id
+ORDER BY o.created_at DESC;
+
+SELECT oi.order_id, p.name, oi.quantity, 
+       oi.price, (oi.quantity * oi.price) AS subtotal
+FROM order_items oi
+JOIN products p ON oi.product_id = p.id;
+
+SELECT u.name, u.email, p.name AS product, 
+       c.quantity, p.price
+FROM cart c
+JOIN users u ON c.user_id = u.id
+JOIN products p ON c.product_id = p.id;
+
+SELECT * FROM orders;
+SELECT * FROM order_items;
