@@ -7,45 +7,58 @@ export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPass, setShowPass] = useState(false);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const validate = () => {
     const errs = {};
-    if (!form.name || form.name.trim().length < 2) errs.name = "Enter your full name";
-    if (!form.email || !/\S+@\S+\.\S+/.test(form.email)) errs.email = "Valid email required";
-    if (!form.password || form.password.length < 6) errs.password = "Min 6 characters";
+    if (!form.name || form.name.trim().length < 2)
+      errs.name = "Enter your full name";
+    if (!form.email || !/\S+@\S+\.\S+/.test(form.email))
+      errs.email = "Valid email required";
+    if (!form.password || form.password.length < 6)
+      errs.password = "Min 6 characters";
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
-      return;
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+
+    setLoading(true);
+    setServerError("");
+    try {
+      const result = await register(form.name, form.email, form.password);
+      if (result.success) {
+        navigate("/");
+      } else {
+        setServerError(result.error || "Registration failed. Please try again.");
+      }
+    } catch (err) {
+      setServerError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    const result = register(form.name, form.email, form.password);
-    if (result.success) navigate("/");
   };
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
     setErrors((er) => ({ ...er, [e.target.name]: undefined }));
+    setServerError("");
   };
 
   const strength =
-    form.password.length === 0
-      ? 0
-      : form.password.length < 6
-      ? 1
-      : form.password.length < 10
-      ? 2
-      : 3;
+    form.password.length === 0 ? 0
+    : form.password.length < 6 ? 1
+    : form.password.length < 10 ? 2
+    : 3;
 
   return (
-    <div className="min-h-[90vh] flex">
-      {/* Left: Image */}
+    <div className="min-h-screen bg-[#0f0e0e] flex">
+      {/* Left Image */}
       <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80"
@@ -61,7 +74,7 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Right: Form */}
+      {/* Right Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
           <Link to="/" className="block mb-10">
@@ -80,7 +93,14 @@ export default function Register() {
             </Link>
           </p>
 
+          {serverError && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded mb-6">
+              {serverError}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Name */}
             <div>
               <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">
                 Full Name
@@ -100,6 +120,7 @@ export default function Register() {
               {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
             </div>
 
+            {/* Email */}
             <div>
               <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">
                 Email
@@ -120,6 +141,7 @@ export default function Register() {
               {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-white/60 text-xs uppercase tracking-wider mb-2">
                 Password
@@ -144,7 +166,8 @@ export default function Register() {
                   {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
-              {/* Password Strength */}
+
+              {/* Password strength */}
               {form.password.length > 0 && (
                 <div className="mt-2">
                   <div className="flex gap-1">
@@ -153,11 +176,9 @@ export default function Register() {
                         key={i}
                         className={`h-1 flex-1 rounded-full transition-colors ${
                           strength >= i
-                            ? i === 1
-                              ? "bg-red-400"
-                              : i === 2
-                              ? "bg-yellow-400"
-                              : "bg-green-400"
+                            ? i === 1 ? "bg-red-400"
+                            : i === 2 ? "bg-yellow-400"
+                            : "bg-green-400"
                             : "bg-white/10"
                         }`}
                       />
@@ -168,16 +189,15 @@ export default function Register() {
                   </p>
                 </div>
               )}
-              {errors.password && (
-                <p className="text-red-400 text-xs mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
             </div>
 
             <button
               type="submit"
-              className="w-full py-4 bg-[#c9a96e] text-black font-semibold uppercase tracking-wider text-sm rounded hover:bg-[#d4b87d] transition-colors mt-2"
+              disabled={loading}
+              className="w-full py-4 bg-[#c9a96e] text-black font-semibold uppercase tracking-wider text-sm rounded hover:bg-[#d4b87d] transition-colors mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
